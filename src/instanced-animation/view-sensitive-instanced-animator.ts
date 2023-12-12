@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 import { InstancedAnimation } from "./instanced-animation";
 import { GLTF } from "three/examples/jsm/Addons.js";
 import { InstancedSkinnedMeshData } from "./instanced-skinned-mesh-handler";

@@ -1,5 +1,5 @@
 import "./style.css";
-import * as THREE from "three";
+import { THREE } from "./three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { InstancedAnimation } from "./instanced-animation/instanced-animation";
 import { GROUND_SIZE, PADDING, setup } from "./setup";

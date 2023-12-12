@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 import { GLTF } from "three/examples/jsm/Addons.js";
 import {

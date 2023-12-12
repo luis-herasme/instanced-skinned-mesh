@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "./three";
 import Stats from "stats.js";
 import { MapControls } from "three/examples/jsm/Addons.js";
 

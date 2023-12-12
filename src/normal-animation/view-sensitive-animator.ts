@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 import { AnimationInstance } from "./normal-animation";
 
 function lerp(a: number, b: number, t: number): number {
@@ -60,7 +60,7 @@ export class ViewSensitiveAnimator {
         true
       ) as THREE.SkinnedMesh<THREE.BufferGeometry, THREE.Material>;
       skinnedMesh.bindMode = "detached";
-
+      
       this.rootBones.push(rootBone);
       this.skinnedMeshes.push(skinnedMesh);
       this.group.add(rootBone);

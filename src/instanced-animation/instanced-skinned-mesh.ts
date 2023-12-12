@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 
 const _instanceLocalMatrix = /*@__PURE__*/ new THREE.Matrix4();
 const _instanceWorldMatrix = /*@__PURE__*/ new THREE.Matrix4();

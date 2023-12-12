@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 import { GLTF, SkeletonUtils } from "three/examples/jsm/Addons.js";
 
 export type AnimationInstance = {

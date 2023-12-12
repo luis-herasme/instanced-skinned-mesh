@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { THREE } from "../three";
 import { InstancedSkinnedMesh } from "./instanced-skinned-mesh";
 
 export type InstancedSkinnedMeshData = {
