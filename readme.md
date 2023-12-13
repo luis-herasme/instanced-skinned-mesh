@@ -62,7 +62,7 @@ function update(deltaTime) {
     (instance.currentTime + deltaTime) %
     gltf.animations[instance.animationIndex].duration;
 
-  this.updateInstance(i);
+  this.updateInstance(0);
   this.updateSkinnedMeshes();
 }
 ```
