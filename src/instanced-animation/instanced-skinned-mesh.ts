@@ -229,8 +229,6 @@ export class InstancedSkinnedMesh extends THREE.SkinnedMesh {
   }
 
   setBonesAt(index: number, skeleton: THREE.Skeleton) {
-    skeleton = skeleton || this.skeleton;
-
     const size = skeleton.bones.length * 16;
 
     if (this.instanceBones === null) {
