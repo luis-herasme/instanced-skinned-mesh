@@ -86,7 +86,12 @@ export class ViewSensitiveInstancedAnimator {
       }
 
       this.modelBoundingBox.translate(instanceData.position.clone().negate());
-      this.instancedAnimation.updateInstance(i);
+
+      this.instancedAnimation.updateInstance(
+        i,
+        // Animation level of detail
+        (1 - Math.min(distance / this.maxDistance, 1)) * 11
+      );
       this.lastUpdateTimes[i] = now;
     }
 

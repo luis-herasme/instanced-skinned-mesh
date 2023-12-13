@@ -31,7 +31,7 @@ export class InstancedSkinnedMeshHandler {
     this.instancesData = instancesData;
     this.animations = animations;
     this.skinnedMesh = skinnedMesh;
-    
+
     this.instancedMesh = new InstancedSkinnedMesh(
       this.skinnedMesh.geometry,
       this.skinnedMesh.material,
@@ -54,7 +54,7 @@ export class InstancedSkinnedMeshHandler {
     this.instancedMesh.frustumCulled = false;
   }
 
-  updateInstance(i: number) {
+  updateInstance(i: number, maxLevelOfDetail: number) {
     const instanceData = this.instancesData[i];
     this.animationsActions[instanceData.animationIndex].play();
     this.mixer.setTime(instanceData.currentTime);
@@ -79,7 +79,15 @@ export class InstancedSkinnedMeshHandler {
     );
 
     this.skinnedMesh.updateMatrix();
-    this.skinnedMesh.skeleton.bones.forEach((bone) => bone.updateMatrixWorld());
+
+    const bonesLength = this.skinnedMesh.skeleton.bones.length;
+    for (let i = 0; bonesLength > i; i++) {
+      const bone = this.skinnedMesh.skeleton.bones[i];
+      if (bone.userData.level <= maxLevelOfDetail) {
+        bone.updateMatrixWorld();
+      }
+    }
+
     this.instancedMesh.setMatrixAt(i, this.skinnedMesh.matrix);
     this.instancedMesh.setBonesAt(i, this.skinnedMesh.skeleton);
 

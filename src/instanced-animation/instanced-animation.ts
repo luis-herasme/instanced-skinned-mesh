@@ -37,8 +37,35 @@ export class InstancedAnimation {
   public animations: THREE.AnimationClip[] = [];
   public instancesData: InstancedSkinnedMeshData[] = [];
   private skinnedMeshesAnimations: InstancedSkinnedMeshHandler[] = [];
+  public maxLevelOfDetail: number = 0;
 
   constructor({ gltf, count }: { gltf: GLTF; count: number }) {
+    let maxLevel = 0;
+
+    // Add information about the level in the tree that the bone is
+    gltf.scene.traverse((object) => {
+      if (object.type === "Bone") {
+        if (object.parent && object.parent.type === "Bone") {
+          if (object.parent.userData.level === undefined) {
+            object.parent.userData.level = 0;
+          }
+
+          object.userData.level = object.parent.userData.level + 1;
+
+          if (object.userData.level > maxLevel) {
+            maxLevel = object.userData.level;
+          }
+        }
+      }
+    });
+
+    gltf.scene.traverse((object) => {
+      if (object.type === "Bone") {
+        object.userData.maxLevel = maxLevel;
+      }
+    });
+
+    this.maxLevelOfDetail = maxLevel;
     this.animations = gltf.animations.map((clip) => clip.clone());
     const skinnedMeshes = getSkinnedMesh(gltf);
 
@@ -69,15 +96,15 @@ export class InstancedAnimation {
         (instanceData.currentTime + deltaTime) %
         this.animations[instanceData.animationIndex].duration;
 
-      this.updateInstance(i);
+      this.updateInstance(i, Infinity);
     }
 
     this.updateSkinnedMeshes();
   }
 
-  updateInstance(i: number) {
+  updateInstance(i: number, maxLevel: number) {
     for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
-      this.skinnedMeshesAnimations[j].updateInstance(i);
+      this.skinnedMeshesAnimations[j].updateInstance(i, maxLevel);
     }
   }
 
@@ -91,7 +118,10 @@ export class InstancedAnimation {
     this.instancesData.push(data);
 
     this.skinnedMeshesAnimations.forEach((skinnedMeshAnimation) => {
-      skinnedMeshAnimation.updateInstance(this.instancesData.length - 1);
+      skinnedMeshAnimation.updateInstance(
+        this.instancesData.length - 1,
+        Infinity
+      );
     });
   }
 }
