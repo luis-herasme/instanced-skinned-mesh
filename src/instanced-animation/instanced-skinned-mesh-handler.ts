@@ -29,12 +29,8 @@ export class InstancedSkinnedMeshHandler {
     instancesData: InstancedSkinnedMeshData[];
   }) {
     this.instancesData = instancesData;
-    this.animations = animations.map((clip) => clip.clone());
-    this.skinnedMesh = skinnedMesh.clone();
-    this.skinnedMesh.geometry = skinnedMesh.geometry.clone();
-    this.skinnedMesh.material = skinnedMesh.material.clone();
-    this.skinnedMesh.skeleton = skinnedMesh.skeleton.clone();
-    this.skinnedMesh.bindMatrix = skinnedMesh.bindMatrix.clone();
+    this.animations = animations;
+    this.skinnedMesh = skinnedMesh;
     
     this.instancedMesh = new InstancedSkinnedMesh(
       this.skinnedMesh.geometry,
