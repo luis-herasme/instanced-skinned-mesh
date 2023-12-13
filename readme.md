@@ -2,8 +2,8 @@
 
 ## InstancedAnimation
 
-This is an abstraction around the `InstancedSkinnedMesh` class created by CodyJasonBennett which is a user-land implementation of this [PR](https://github.com/mrdoob/three.js/pull/22667).
-One of the main differences is that this class takes a `GLTF` object and extracts all the animations and skinned meshes from it, which creates a more convenient API for the user. This is more similar to default animation system in `three.js`.
+This is an abstraction around the `InstancedSkinnedMesh` class created by CodyJasonBennett, which is a user-land implementation of this [PR](https://github.com/mrdoob/three.js/pull/22667).
+One of the main differences is that this class takes a `GLTF` object and extracts all the animations and skinned meshes from it, which creates a more convenient API for the user. This is more similar to the default animation system in `three.js`. Additionally, this class is more high-level and does all the boilerplate for you, so you don't have to update the skinned meshes and bones manually.
 
 ### Usage
 
@@ -33,7 +33,7 @@ function update(deltaTime) {
 }
 ```
 
-If you want to manage the animation update rate of each instance yourself, you can use the `updateInstance` method instead of `update`:
+If you want to manage the animation update rate of each instance yourself, you can use the `updateInstance` method instead of `update`. And remember to call `updateSkinnedMeshes` after updating all the instances.
 
 ```ts
 import { InstancedAnimation } from "./InstancedAnimation.ts";
@@ -65,7 +65,7 @@ function update(deltaTime) {
 
 ## ViewSensitiveInstancedAnimator
 
-This is an abstraction around the `InstancedAnimation` class which allows you to control the animation update rate based on the distance from the camera and ignore the instances that are outside of the camera's frustum. This is useful for large scenes with many animated objects.
+This is an abstraction around the `InstancedAnimation` class, which allows you to control the animation update rate based on the distance from the camera and ignore the instances outside the camera's frustum. This is useful for large scenes with many animated objects.
 
 ### Usage
 
