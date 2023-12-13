@@ -20,9 +20,6 @@ export class ViewSensitiveAnimator {
   rootBones: THREE.Bone[] = [];
   skinnedMeshes: THREE.SkinnedMesh<THREE.BufferGeometry, THREE.Material>[] = [];
 
-  // FOR DEBUGGING
-  private instancesInsideFrustum: boolean[] = [];
-
   constructor({
     camera,
     minAnimationDuration,
@@ -67,13 +64,7 @@ export class ViewSensitiveAnimator {
     }
   }
 
-  get numberOfInstancesInsideFrustum() {
-    return this.instancesInsideFrustum.filter((inside) => inside).length;
-  }
-
   public update(deltaTime: number) {
-    console.log("Number of instances inside frustum: ", this.numberOfInstancesInsideFrustum)
-    let instancesUpdated = 0;
     const now = Date.now();
     const cameraFrustum = new THREE.Frustum();
     cameraFrustum.setFromProjectionMatrix(
@@ -106,10 +97,7 @@ export class ViewSensitiveAnimator {
         this.modelBoundingBox.translate(
           instance.model.position.clone().negate()
         );
-        this.instancesInsideFrustum[i] = false;
         continue;
-      } else {
-        this.instancesInsideFrustum[i] = true;
       }
 
       this.modelBoundingBox.translate(instance.model.position.clone().negate());
@@ -125,9 +113,6 @@ export class ViewSensitiveAnimator {
       this.rootBones[i].updateWorldMatrix(false, true);
 
       this.lastUpdateTimes[i] = now;
-      instancesUpdated++;
     }
-
-    console.log("instancesUpdated: ", instancesUpdated);
   }
 }

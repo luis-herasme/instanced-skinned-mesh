@@ -17,9 +17,6 @@ export class ViewSensitiveInstancedAnimator {
   public minAnimationDuration: number;
   public maxAnimationDuration: number;
 
-  // FOR DEBUGGING
-  private instancesInsideFrustum: boolean[] = [];
-
   constructor({
     camera,
     minAnimationDuration,
@@ -43,17 +40,11 @@ export class ViewSensitiveInstancedAnimator {
     this.modelBoundingBox = new THREE.Box3().setFromObject(gltf.scene.clone());
   }
 
-  get numberOfInstancesInsideFrustum() {
-    return this.instancesInsideFrustum.filter((inside) => inside).length;
-  }
-
   public addInstance(data: InstancedSkinnedMeshData) {
     this.instancedAnimation.addInstance(data);
   }
 
   public update(deltaTime: number) {
-    console.log("Number of instances inside frustum: ", this.numberOfInstancesInsideFrustum)
-    let instancesUpdated = 0;
     const now = Date.now();
     const cameraFrustum = new THREE.Frustum();
 
@@ -91,20 +82,15 @@ export class ViewSensitiveInstancedAnimator {
 
       if (!cameraFrustum.intersectsBox(this.modelBoundingBox)) {
         this.modelBoundingBox.translate(instanceData.position.clone().negate());
-        this.instancesInsideFrustum[i] = false;
         continue;
-      } else {
-        this.instancesInsideFrustum[i] = true;
       }
 
       this.modelBoundingBox.translate(instanceData.position.clone().negate());
       this.instancedAnimation.updateInstance(i);
       this.lastUpdateTimes[i] = now;
-      instancesUpdated++;
     }
 
     this.instancedAnimation.updateSkinnedMeshes();
-    console.log("instancesUpdated: ", instancesUpdated);
   }
 
   get group() {
