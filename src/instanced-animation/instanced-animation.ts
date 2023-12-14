@@ -98,19 +98,11 @@ export class InstancedAnimation {
 
       this.updateInstance(i, Infinity);
     }
-
-    this.updateSkinnedMeshes();
   }
 
   updateInstance(i: number, maxLevel: number) {
     for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
       this.skinnedMeshesAnimations[j].updateInstance(i, maxLevel);
-    }
-  }
-
-  updateSkinnedMeshes() {
-    for (const skinnedMeshAnimation of this.skinnedMeshesAnimations) {
-      skinnedMeshAnimation.updateInstancedMesh();
     }
   }
 

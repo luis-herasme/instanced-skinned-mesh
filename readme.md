@@ -37,7 +37,7 @@ function update(deltaTime) {
 }
 ```
 
-If you want to manage the animation update rate of each instance yourself, you can use the `updateInstance` method instead of `update`. And remember to call `updateSkinnedMeshes` after updating all the instances.
+If you want to manage the animation update rate of each instance yourself, you can use the `updateInstance` method instead of `update`.
 
 ```ts
 import { InstancedAnimation } from "./InstancedAnimation.ts";
@@ -63,7 +63,6 @@ function update(deltaTime) {
     gltf.animations[instance.animationIndex].duration;
 
   this.updateInstance(0);
-  this.updateSkinnedMeshes();
 }
 ```
 

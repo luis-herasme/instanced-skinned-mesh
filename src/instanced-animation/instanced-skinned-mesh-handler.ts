@@ -94,19 +94,6 @@ export class InstancedSkinnedMeshHandler {
     this.animationsActions[instanceData.animationIndex].stop();
   }
 
-  updateInstancedMesh() {
-    this.instancedMesh.instanceMatrix.needsUpdate = true;
-
-    if (
-      this.instancedMesh.skeleton &&
-      // @ts-ignore
-      this.instancedMesh.skeleton.bonetexture
-    ) {
-      // @ts-ignore
-      this.instancedMesh.skeleton.bonetexture.needsUpdate = true;
-    }
-  }
-
   dispose() {
     this.instancedMesh.dispose();
   }

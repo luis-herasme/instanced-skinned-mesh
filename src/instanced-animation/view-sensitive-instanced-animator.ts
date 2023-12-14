@@ -94,8 +94,6 @@ export class ViewSensitiveInstancedAnimator {
       );
       this.lastUpdateTimes[i] = now;
     }
-
-    this.instancedAnimation.updateSkinnedMeshes();
   }
 
   get group() {
