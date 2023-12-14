@@ -1,6 +1,7 @@
 import { GLTF } from "three/examples/jsm/Addons.js";
-import { THREE } from "../three";
 import { InstancedSkinnedMesh } from "./instanced-skinned-mesh";
+import { AnimationAction } from "../animation-action";
+import { AnimationMixer } from "../animation-mixer";
 
 export type InstancedSkinnedMeshData = {
   position: THREE.Vector3;
@@ -11,10 +12,10 @@ export type InstancedSkinnedMeshData = {
 };
 
 export class InstancedSkinnedMeshHandler {
-  private mixer: THREE.AnimationMixer;
+  private mixer: AnimationMixer;
+  private animationsActions: AnimationAction[] = [];
   private instancesData: InstancedSkinnedMeshData[];
   private skinnedMesh: THREE.SkinnedMesh<THREE.BufferGeometry, THREE.Material>;
-  private animationsActions: THREE.AnimationAction[] = [];
   private animations: THREE.AnimationClip[];
   public instancedMesh: InstancedSkinnedMesh;
 
@@ -47,7 +48,7 @@ export class InstancedSkinnedMeshHandler {
       this.skinnedMesh.bindMatrix
     );
 
-    this.mixer = new THREE.AnimationMixer(this.skinnedMesh);
+    this.mixer = new AnimationMixer(this.skinnedMesh);
 
     this.animations.forEach((clip, index) => {
       const newClip = clip.clone();
