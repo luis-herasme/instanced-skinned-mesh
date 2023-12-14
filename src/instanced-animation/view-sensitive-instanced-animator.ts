@@ -90,7 +90,10 @@ export class ViewSensitiveInstancedAnimator {
       this.instancedAnimation.updateInstance(
         i,
         // Animation level of detail
-        (1 - Math.min(distance / this.maxDistance, 1)) * 11
+        Math.round(
+          (1 - Math.min(distance / this.maxDistance, 1)) *
+            this.instancedAnimation.maxLevelOfDetail
+        )
       );
       this.lastUpdateTimes[i] = now;
     }

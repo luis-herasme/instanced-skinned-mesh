@@ -75,6 +75,7 @@ export class InstancedAnimation {
         skinnedMesh,
         animations: this.animations,
         instancesData: this.instancesData,
+        gltf
       });
 
       this.skinnedMeshesAnimations.push(instancedSkinnedMeshHandler);

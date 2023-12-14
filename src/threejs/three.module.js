@@ -49233,6 +49233,7 @@ class AnimationAction {
 
 			const interpolant = tracks[ i ].createInterpolant( null );
 			interpolants[ i ] = interpolant;
+			interpolant.level = tracks[ i ].level;
 			interpolant.settings = interpolantSettings;
 
 		}
@@ -49528,7 +49529,7 @@ class AnimationAction {
 
 	// Interna
 
-	_update( time, deltaTime, timeDirection, accuIndex ) {
+	_update( time, deltaTime, timeDirection, accuIndex, maxLOD ) {
 
 		// called by the mixer
 
@@ -49577,12 +49578,18 @@ class AnimationAction {
 			const interpolants = this._interpolants;
 			const propertyMixers = this._propertyBindings;
 
+			if (maxLOD === undefined || maxLOD === Infinity) {
+				maxLOD = interpolants.length;
+			}
+
 			switch ( this.blendMode ) {
 
 				case AdditiveAnimationBlendMode:
 
 					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
-
+						if (interpolants[ j ].level > maxLOD) {
+							continue;
+						}
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulateAdditive( weight );
 
@@ -49594,7 +49601,9 @@ class AnimationAction {
 				default:
 
 					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
-
+						if (interpolants[ j ].level > maxLOD) {
+							continue;
+						}
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulate( accuIndex, weight );
 
@@ -50513,7 +50522,7 @@ class AnimationMixer extends EventDispatcher {
 	}
 
 	// advance the time and update apply the animation
-	update( deltaTime ) {
+	update( deltaTime, maxLOD ) {
 
 		deltaTime *= this.timeScale;
 
@@ -50531,7 +50540,7 @@ class AnimationMixer extends EventDispatcher {
 
 			const action = actions[ i ];
 
-			action._update( time, deltaTime, timeDirection, accuIndex );
+			action._update( time, deltaTime, timeDirection, accuIndex, maxLOD );
 
 		}
 
@@ -50551,7 +50560,7 @@ class AnimationMixer extends EventDispatcher {
 	}
 
 	// Allows you to seek to a specific time in an animation.
-	setTime( timeInSeconds ) {
+	setTime( timeInSeconds, maxLOD ) {
 
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
 		for ( let i = 0; i < this._actions.length; i ++ ) {
@@ -50560,7 +50569,7 @@ class AnimationMixer extends EventDispatcher {
 
 		}
 
-		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
+		return this.update( timeInSeconds, maxLOD ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
 	}
 

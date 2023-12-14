@@ -1,3 +1,4 @@
+import { GLTF } from "three/examples/jsm/Addons.js";
 import { THREE } from "../three";
 import { InstancedSkinnedMesh } from "./instanced-skinned-mesh";
 
@@ -22,11 +23,13 @@ export class InstancedSkinnedMeshHandler {
     skinnedMesh,
     animations,
     instancesData,
+    gltf,
   }: {
     count: number;
     skinnedMesh: THREE.SkinnedMesh<THREE.BufferGeometry, THREE.Material>;
     animations: THREE.AnimationClip[];
     instancesData: InstancedSkinnedMeshData[];
+    gltf: GLTF;
   }) {
     this.instancesData = instancesData;
     this.animations = animations;
@@ -47,17 +50,30 @@ export class InstancedSkinnedMeshHandler {
     this.mixer = new THREE.AnimationMixer(this.skinnedMesh);
 
     this.animations.forEach((clip, index) => {
-      const action = this.mixer.clipAction(clip.clone());
+      const newClip = clip.clone();
+      newClip.tracks.forEach((track) => {
+        const interpolantBone = gltf.scene.getObjectByName(
+          track.name.split(".")[0]
+        );
+        // @ts-ignore
+        track.level = interpolantBone.userData.level;
+      });
+      const action = this.mixer.clipAction(newClip);
       this.animationsActions[index] = action;
     });
 
     this.instancedMesh.frustumCulled = false;
+
+    for (const bone of this.skinnedMesh.skeleton.bones) {
+      bone.matrixWorldAutoUpdate = false;
+    }
   }
 
   updateInstance(i: number, maxLevelOfDetail: number) {
     const instanceData = this.instancesData[i];
     this.animationsActions[instanceData.animationIndex].play();
-    this.mixer.setTime(instanceData.currentTime);
+    // @ts-ignore
+    this.mixer.setTime(instanceData.currentTime, maxLevelOfDetail);
 
     this.skinnedMesh.scale.set(
       instanceData.scale.x,
@@ -83,8 +99,21 @@ export class InstancedSkinnedMeshHandler {
     const bonesLength = this.skinnedMesh.skeleton.bones.length;
     for (let i = 0; bonesLength > i; i++) {
       const bone = this.skinnedMesh.skeleton.bones[i];
-      if (bone.userData.level <= maxLevelOfDetail) {
-        bone.updateMatrixWorld();
+      if (bone.matrixAutoUpdate) {
+        bone.updateMatrix();
+      }
+
+      if (bone.matrixWorldNeedsUpdate) {
+        if (bone.parent === null) {
+          bone.matrixWorld.copy(bone.matrix);
+        } else {
+          bone.matrixWorld.multiplyMatrices(
+            bone.parent.matrixWorld,
+            bone.matrix
+          );
+        }
+
+        bone.matrixWorldNeedsUpdate = false;
       }
     }
 
