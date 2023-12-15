@@ -12,7 +12,7 @@ import { ViewSensitiveInstancedAnimator } from "./instanced-animation/view-sensi
 import { ViewSensitiveAnimator } from "./normal-animation/view-sensitive-animator";
 
 const loader = new GLTFLoader();
-const gltf = await loader.loadAsync("warrok.glb");
+const gltf = await loader.loadAsync("zombie.glb");
 
 const sceneManager = setup();
 
@@ -187,12 +187,12 @@ function animate() {
   const deltaTime = clock.getDelta();
 
   sceneManager.stats.begin();
-  sceneManager.update(deltaTime);
 
   if (scenario) {
     scenario.update(deltaTime);
   }
 
+  sceneManager.update(deltaTime);
   sceneManager.stats.end();
   requestAnimationFrame(animate);
 }

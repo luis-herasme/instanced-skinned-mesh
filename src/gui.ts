@@ -14,9 +14,9 @@ export function setupGUI(test: (settings: Settings) => void) {
     numberOfInstances: 100,
     viewSensitive: false,
     instanced: false,
-    minAnimationDuration: 1000 / 60,
+    minAnimationDuration: 30,
     maxAnimationDuration: 100,
-    maxDistance: 80,
+    maxDistance: 140,
   };
 
   test(settings);
