@@ -3,6 +3,11 @@ import { InstancedSkinnedMesh } from "./instanced-skinned-mesh";
 import { AnimationAction } from "../animation-action";
 import { AnimationMixer } from "../animation-mixer";
 
+export type MixerState = {
+  animationIndex: number;
+  time: number;
+};
+
 export type InstancedSkinnedMeshData = {
   position: THREE.Vector3;
   rotation: THREE.Quaternion;
@@ -126,5 +131,58 @@ export class InstancedSkinnedMeshHandler {
 
   dispose() {
     this.instancedMesh.dispose();
+  }
+
+  updateMixer({ animationIndex, time }: MixerState) {
+    this.animationsActions[animationIndex].play();
+    this.mixer.setTime(time);
+
+    const bonesLength = this.skinnedMesh.skeleton.bones.length;
+    for (let i = 0; bonesLength > i; i++) {
+      const bone = this.skinnedMesh.skeleton.bones[i];
+      if (bone.matrixAutoUpdate) {
+        bone.updateMatrix();
+      }
+
+      if (bone.matrixWorldNeedsUpdate) {
+        if (bone.parent === null) {
+          bone.matrixWorld.copy(bone.matrix);
+        } else {
+          bone.matrixWorld.multiplyMatrices(
+            bone.parent.matrixWorld,
+            bone.matrix
+          );
+        }
+      }
+    }
+  }
+
+  stopAnimation(animationIndex: number) {
+    this.animationsActions[animationIndex].stop();
+  }
+
+  updateSkinnedMeshMatrix(i: number) {
+    const instanceData = this.instancesData[i];
+
+    this.skinnedMesh.scale.set(
+      instanceData.scale.x,
+      instanceData.scale.y,
+      instanceData.scale.z
+    );
+
+    this.skinnedMesh.position.set(
+      instanceData.position.x,
+      instanceData.position.y,
+      instanceData.position.z
+    );
+
+    this.skinnedMesh.quaternion.set(
+      instanceData.rotation.x,
+      instanceData.rotation.y,
+      instanceData.rotation.z,
+      instanceData.rotation.w
+    );
+
+    this.instancedMesh.setBonesAt(i, this.skinnedMesh.skeleton);
   }
 }

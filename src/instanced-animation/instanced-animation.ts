@@ -4,6 +4,7 @@ import { GLTF } from "three/examples/jsm/Addons.js";
 import {
   InstancedSkinnedMeshData,
   InstancedSkinnedMeshHandler,
+  MixerState,
 } from "./instanced-skinned-mesh-handler";
 
 type SimpleSkinnedMesh = THREE.SkinnedMesh<
@@ -75,7 +76,7 @@ export class InstancedAnimation {
         skinnedMesh,
         animations: this.animations,
         instancesData: this.instancesData,
-        gltf
+        gltf,
       });
 
       this.skinnedMeshesAnimations.push(instancedSkinnedMeshHandler);
@@ -107,14 +108,31 @@ export class InstancedAnimation {
     }
   }
 
-  addInstance(data: InstancedSkinnedMeshData) {
-    this.instancesData.push(data);
+  updateMixer(mixerState: MixerState) {
+    for (let i = 0; i < this.skinnedMeshesAnimations.length; i++) {
+      this.skinnedMeshesAnimations[i].updateMixer(mixerState);
+    }
+  }
 
-    this.skinnedMeshesAnimations.forEach((skinnedMeshAnimation) => {
-      skinnedMeshAnimation.updateInstance(
-        this.instancesData.length - 1,
-        Infinity
-      );
-    });
+  stopAnimation(i: number) {
+    for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
+      this.skinnedMeshesAnimations[j].stopAnimation(i);
+    }
+  }
+
+  updateSkinnedMeshMatrix(i: number) {
+    for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
+      this.skinnedMeshesAnimations[j].updateSkinnedMeshMatrix(i);
+    }
+  }
+
+  addInstance(data: InstancedSkinnedMeshData) {
+    const instanceIndex = this.instancesData.length;
+    this.instancesData[instanceIndex] = data;
+
+    for (let i = 0; i < this.skinnedMeshesAnimations.length; i++) {
+      const skinnedMeshAnimation = this.skinnedMeshesAnimations[i];
+      skinnedMeshAnimation.updateInstance(instanceIndex, Infinity);
+    }
   }
 }

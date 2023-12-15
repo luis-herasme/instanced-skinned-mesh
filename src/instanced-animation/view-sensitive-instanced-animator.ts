@@ -7,11 +7,21 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+type AnimationGroupID = string;
+type AnimationGroup = {
+  animationIndex: number;
+  currentTime: number;
+  instancesIDs: number[];
+};
+
+type AnimationGroups = Map<AnimationGroupID, AnimationGroup>;
+
 export class ViewSensitiveInstancedAnimator {
   private camera: THREE.Camera;
   private instancedAnimation: InstancedAnimation;
   private modelBoundingBox: THREE.Box3;
   private lastUpdateTimes: number[] = [];
+  private animationGroups: AnimationGroups = new Map();
 
   public maxDistance: number;
   public minAnimationDuration: number;
@@ -58,10 +68,15 @@ export class ViewSensitiveInstancedAnimator {
     for (let i = 0; i < this.instancedAnimation.instancesData.length; i++) {
       const instanceData = this.instancedAnimation.instancesData[i];
 
-      instanceData.currentTime =
-        (instanceData.currentTime + deltaTime) %
+      const animationDuration =
         this.instancedAnimation.animations[instanceData.animationIndex]
           .duration;
+
+      instanceData.currentTime = instanceData.currentTime + deltaTime;
+
+      if (instanceData.currentTime > animationDuration) {
+        instanceData.currentTime = 0;
+      }
 
       const distance = instanceData.position.distanceTo(this.camera.position);
 
@@ -87,16 +102,52 @@ export class ViewSensitiveInstancedAnimator {
 
       this.modelBoundingBox.translate(instanceData.position.clone().negate());
 
-      this.instancedAnimation.updateInstance(
-        i,
-        // Animation level of detail
-        Math.round(
-          (1 - Math.min(distance / this.maxDistance, 1)) *
-            this.instancedAnimation.maxLevelOfDetail
-        )
-      );
+      const minAnimationDurationInSeconds = this.minAnimationDuration / 1000;
+
+      let currentTime =
+        Math.round(instanceData.currentTime / minAnimationDurationInSeconds) *
+        minAnimationDurationInSeconds;
+
+      if (distance > this.maxDistance) {
+        const maxAnimationDurationInSeconds = this.maxAnimationDuration / 1000;
+
+        currentTime =
+          Math.round(instanceData.currentTime / maxAnimationDurationInSeconds) *
+          maxAnimationDurationInSeconds;
+      }
+
+      const groupID = `${instanceData.animationIndex}-${currentTime}`;
+      let group = this.animationGroups.get(groupID);
+
+      if (group === undefined) {
+        group = {
+          animationIndex: instanceData.animationIndex,
+          currentTime: currentTime,
+          instancesIDs: [i],
+        };
+
+        this.animationGroups.set(groupID, group);
+      } else {
+        group.instancesIDs.push(i);
+      }
+
       this.lastUpdateTimes[i] = now;
     }
+
+    for (const group of this.animationGroups.values()) {
+      this.instancedAnimation.updateMixer({
+        animationIndex: group.animationIndex,
+        time: group.currentTime,
+      });
+
+      for (const instanceID of group.instancesIDs) {
+        this.instancedAnimation.updateSkinnedMeshMatrix(instanceID);
+      }
+
+      this.instancedAnimation.stopAnimation(group.animationIndex);
+    }
+
+    this.animationGroups.clear();
   }
 
   get group() {
