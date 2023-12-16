@@ -10,6 +10,7 @@ import {
 } from "./normal-animation/normal-animation";
 import { ViewSensitiveInstancedAnimator } from "./instanced-animation/view-sensitive-instanced-animator";
 import { ViewSensitiveAnimator } from "./normal-animation/view-sensitive-animator";
+import { InstancedSkinnedMeshData } from "./instanced-animation/instanced-skinned-mesh-handler";
 
 const loader = new GLTFLoader();
 const gltf = await loader.loadAsync("zombie.glb");
@@ -95,13 +96,13 @@ const instancedViewSensitive: ScenarioCreator = (settings: Settings) => {
     gltf: gltf,
     count: settings.numberOfInstances,
   });
-
+  const instances: InstancedSkinnedMeshData[] = [];
   for (let i = 0; i < settings.numberOfInstances; i++) {
     const x = ((i * PADDING) % GROUND_SIZE) - GROUND_SIZE / 2;
     const y =
       Math.floor((i * PADDING) / GROUND_SIZE) * PADDING - GROUND_SIZE / 2;
 
-    viewSensitiveInstancedAnimation.addInstance({
+    const intance: InstancedSkinnedMeshData = {
       position: new THREE.Vector3(x, 0, y),
       currentTime: Math.random(),
       animationIndex: Math.floor(
@@ -112,7 +113,10 @@ const instancedViewSensitive: ScenarioCreator = (settings: Settings) => {
         Math.PI / 2
       ),
       scale: new THREE.Vector3(0.01, 0.01, 0.01),
-    });
+    };
+
+    viewSensitiveInstancedAnimation.addInstance(intance);
+    instances.push(intance);
   }
 
   sceneManager.scene.add(viewSensitiveInstancedAnimation.group);

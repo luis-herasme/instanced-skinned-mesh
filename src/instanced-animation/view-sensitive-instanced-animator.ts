@@ -147,6 +147,10 @@ export class ViewSensitiveInstancedAnimator {
       this.instancedAnimation.stopAnimation(group.animationIndex);
     }
 
+    if (this.animationGroups.size > 0) {
+      this.instancedAnimation.instanceMatrixNeedsUpdate();
+    }
+
     this.animationGroups.clear();
   }
 

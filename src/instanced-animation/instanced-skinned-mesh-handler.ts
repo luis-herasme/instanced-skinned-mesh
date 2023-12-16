@@ -163,26 +163,12 @@ export class InstancedSkinnedMeshHandler {
 
   updateSkinnedMeshMatrix(i: number) {
     const instanceData = this.instancesData[i];
+    this.skinnedMesh.scale.copy(instanceData.scale);
+    this.skinnedMesh.position.copy(instanceData.position);
+    this.skinnedMesh.quaternion.copy(instanceData.rotation);
 
-    this.skinnedMesh.scale.set(
-      instanceData.scale.x,
-      instanceData.scale.y,
-      instanceData.scale.z
-    );
-
-    this.skinnedMesh.position.set(
-      instanceData.position.x,
-      instanceData.position.y,
-      instanceData.position.z
-    );
-
-    this.skinnedMesh.quaternion.set(
-      instanceData.rotation.x,
-      instanceData.rotation.y,
-      instanceData.rotation.z,
-      instanceData.rotation.w
-    );
-
+    this.skinnedMesh.updateMatrix();
+    this.instancedMesh.setMatrixAt(i, this.skinnedMesh.matrix);
     this.instancedMesh.setBonesAt(i, this.skinnedMesh.skeleton);
   }
 }

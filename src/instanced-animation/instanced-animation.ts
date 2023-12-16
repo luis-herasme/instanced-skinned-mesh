@@ -37,7 +37,7 @@ export class InstancedAnimation {
   public group = new THREE.Group();
   public animations: THREE.AnimationClip[] = [];
   public instancesData: InstancedSkinnedMeshData[] = [];
-  private skinnedMeshesAnimations: InstancedSkinnedMeshHandler[] = [];
+  public instancedSkinnedMeshes: InstancedSkinnedMeshHandler[] = [];
   public maxLevelOfDetail: number = 0;
 
   constructor({ gltf, count }: { gltf: GLTF; count: number }) {
@@ -79,14 +79,21 @@ export class InstancedAnimation {
         gltf,
       });
 
-      this.skinnedMeshesAnimations.push(instancedSkinnedMeshHandler);
+      this.instancedSkinnedMeshes.push(instancedSkinnedMeshHandler);
       this.group.add(instancedSkinnedMeshHandler.instancedMesh);
     }
   }
 
+  instanceMatrixNeedsUpdate() {
+    for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
+      this.instancedSkinnedMeshes[i].instancedMesh.instanceMatrix.needsUpdate =
+        true;
+    }
+  }
+
   dispose() {
-    for (const skinnedMeshAnimation of this.skinnedMeshesAnimations) {
-      skinnedMeshAnimation.dispose();
+    for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
+      this.instancedSkinnedMeshes[i].dispose();
     }
   }
 
@@ -103,26 +110,26 @@ export class InstancedAnimation {
   }
 
   updateInstance(i: number, maxLevel: number) {
-    for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
-      this.skinnedMeshesAnimations[j].updateInstance(i, maxLevel);
+    for (let j = 0; j < this.instancedSkinnedMeshes.length; j++) {
+      this.instancedSkinnedMeshes[j].updateInstance(i, maxLevel);
     }
   }
 
   updateMixer(mixerState: MixerState) {
-    for (let i = 0; i < this.skinnedMeshesAnimations.length; i++) {
-      this.skinnedMeshesAnimations[i].updateMixer(mixerState);
+    for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
+      this.instancedSkinnedMeshes[i].updateMixer(mixerState);
     }
   }
 
   stopAnimation(i: number) {
-    for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
-      this.skinnedMeshesAnimations[j].stopAnimation(i);
+    for (let j = 0; j < this.instancedSkinnedMeshes.length; j++) {
+      this.instancedSkinnedMeshes[j].stopAnimation(i);
     }
   }
 
   updateSkinnedMeshMatrix(i: number) {
-    for (let j = 0; j < this.skinnedMeshesAnimations.length; j++) {
-      this.skinnedMeshesAnimations[j].updateSkinnedMeshMatrix(i);
+    for (let j = 0; j < this.instancedSkinnedMeshes.length; j++) {
+      this.instancedSkinnedMeshes[j].updateSkinnedMeshMatrix(i);
     }
   }
 
@@ -130,9 +137,8 @@ export class InstancedAnimation {
     const instanceIndex = this.instancesData.length;
     this.instancesData[instanceIndex] = data;
 
-    for (let i = 0; i < this.skinnedMeshesAnimations.length; i++) {
-      const skinnedMeshAnimation = this.skinnedMeshesAnimations[i];
-      skinnedMeshAnimation.updateInstance(instanceIndex, Infinity);
+    for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
+      this.instancedSkinnedMeshes[i].updateInstance(instanceIndex, Infinity);
     }
   }
 }
