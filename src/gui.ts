@@ -4,8 +4,8 @@ export type Settings = {
   numberOfInstances: number;
   viewSensitive: boolean;
   instanced: boolean;
-  minAnimationDuration: number;
-  maxAnimationDuration: number;
+  minAnimationInterval: number;
+  maxAnimationInterval: number;
   maxDistance: number;
 };
 
@@ -14,8 +14,8 @@ export function setupGUI(test: (settings: Settings) => void) {
     numberOfInstances: 100,
     viewSensitive: false,
     instanced: false,
-    minAnimationDuration: 30,
-    maxAnimationDuration: 100,
+    minAnimationInterval: 30,
+    maxAnimationInterval: 100,
     maxDistance: 140,
   };
 
@@ -41,8 +41,8 @@ export function setupGUI(test: (settings: Settings) => void) {
   });
 
   const viewSensitiveFolder = gui.addFolder("View Sensitive");
-  viewSensitiveFolder.add(settings, "minAnimationDuration", 1, 1000, 1);
-  viewSensitiveFolder.add(settings, "maxAnimationDuration", 1, 1000, 1);
+  viewSensitiveFolder.add(settings, "minAnimationInterval", 1, 1000, 1);
+  viewSensitiveFolder.add(settings, "maxAnimationInterval", 1, 1000, 1);
   viewSensitiveFolder.add(settings, "maxDistance", 1, 1000, 10);
   viewSensitiveFolder.close();
 }

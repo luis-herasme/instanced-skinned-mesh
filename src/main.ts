@@ -89,8 +89,8 @@ const instancedNoViewSensitive: ScenarioCreator = (settings: Settings) => {
 const instancedViewSensitive: ScenarioCreator = (settings: Settings) => {
   const viewSensitiveInstancedAnimation = new ViewSensitiveInstancedAnimator({
     camera: sceneManager.camera,
-    minAnimationDuration: settings.minAnimationDuration,
-    maxAnimationDuration: settings.maxAnimationDuration,
+    minAnimationInterval: settings.minAnimationInterval,
+    maxAnimationInterval: settings.maxAnimationInterval,
     maxDistance: settings.maxDistance,
     gltf: gltf,
     count: settings.numberOfInstances,
@@ -141,8 +141,8 @@ const noInstancedViewSensitive: ScenarioCreator = (settings: Settings) => {
   }
   const viewSensitiveInstancedAnimation = new ViewSensitiveAnimator({
     camera: sceneManager.camera,
-    minAnimationDuration: settings.minAnimationDuration,
-    maxAnimationDuration: settings.maxAnimationDuration,
+    minAnimationInterval: settings.minAnimationInterval,
+    maxAnimationInterval: settings.maxAnimationInterval,
     maxDistance: settings.maxDistance,
     instances,
   });

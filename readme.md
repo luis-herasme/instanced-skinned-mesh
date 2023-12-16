@@ -81,9 +81,9 @@ const viewSensitiveInstancedAnimator = new ViewSensitiveInstancedAnimator({
   gltf: gltf,
   count: 100,
   camera: camera,
-  maxAnimationDuration: 100, // This is the update rate when the instance is at `maxDistance`
-  minAnimationDuration: 1000 / 60, // This is the update rate when the instance in front of the camera
-  maxDistance: 80, // This is the distance at which the instance will be updated at `maxAnimationDuration`
+  maxAnimationInterval: 100, // This is the update rate when the instance is at `maxDistance`
+  minAnimationInterval: 1000 / 60, // This is the update rate when the instance in front of the camera
+  maxDistance: 80, // This is the distance at which the instance will be updated at `maxAnimationInterval`
 });
 
 const instance = {

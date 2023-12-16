@@ -24,27 +24,27 @@ export class ViewSensitiveInstancedAnimator {
   private animationGroups: AnimationGroups = new Map();
 
   public maxDistance: number;
-  public minAnimationDuration: number;
-  public maxAnimationDuration: number;
+  public minAnimationInterval: number;
+  public maxAnimationInterval: number;
 
   constructor({
     camera,
-    minAnimationDuration,
-    maxAnimationDuration,
+    minAnimationInterval,
+    maxAnimationInterval,
     maxDistance,
     gltf,
     count,
   }: {
     camera: THREE.Camera;
-    minAnimationDuration: number;
-    maxAnimationDuration: number;
+    minAnimationInterval: number;
+    maxAnimationInterval: number;
     maxDistance: number;
     gltf: GLTF;
     count: number;
   }) {
     this.camera = camera;
-    this.minAnimationDuration = minAnimationDuration;
-    this.maxAnimationDuration = maxAnimationDuration;
+    this.minAnimationInterval = minAnimationInterval;
+    this.maxAnimationInterval = maxAnimationInterval;
     this.maxDistance = maxDistance;
     this.instancedAnimation = new InstancedAnimation({ gltf, count });
     this.modelBoundingBox = new THREE.Box3().setFromObject(gltf.scene.clone());
@@ -83,8 +83,8 @@ export class ViewSensitiveInstancedAnimator {
       // updateRate, how many times per second we should update the instance,
       // based on the distance from the camera
       const updateRate = lerp(
-        this.minAnimationDuration,
-        this.maxAnimationDuration,
+        this.minAnimationInterval,
+        this.maxAnimationInterval,
         distance / this.maxDistance
       );
 
@@ -102,14 +102,14 @@ export class ViewSensitiveInstancedAnimator {
 
       this.modelBoundingBox.translate(instanceData.position.clone().negate());
 
-      const minAnimationDurationInSeconds = this.minAnimationDuration / 1000;
+      const minAnimationDurationInSeconds = this.minAnimationInterval / 1000;
 
       let currentTime =
         Math.round(instanceData.currentTime / minAnimationDurationInSeconds) *
         minAnimationDurationInSeconds;
 
       if (distance > this.maxDistance) {
-        const maxAnimationDurationInSeconds = this.maxAnimationDuration / 1000;
+        const maxAnimationDurationInSeconds = this.maxAnimationInterval / 1000;
 
         currentTime =
           Math.round(instanceData.currentTime / maxAnimationDurationInSeconds) *

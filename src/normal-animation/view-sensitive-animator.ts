@@ -12,8 +12,8 @@ export class ViewSensitiveAnimator {
   private lastUpdateTimes: number[] = [];
 
   public maxDistance: number;
-  public minAnimationDuration: number;
-  public maxAnimationDuration: number;
+  public minAnimationInterval: number;
+  public maxAnimationInterval: number;
 
   public group = new THREE.Group();
 
@@ -22,20 +22,20 @@ export class ViewSensitiveAnimator {
 
   constructor({
     camera,
-    minAnimationDuration,
-    maxAnimationDuration,
+    minAnimationInterval,
+    maxAnimationInterval,
     maxDistance,
     instances,
   }: {
     camera: THREE.Camera;
-    minAnimationDuration: number;
-    maxAnimationDuration: number;
+    minAnimationInterval: number;
+    maxAnimationInterval: number;
     maxDistance: number;
     instances: AnimationInstance[];
   }) {
     this.camera = camera;
-    this.minAnimationDuration = minAnimationDuration;
-    this.maxAnimationDuration = maxAnimationDuration;
+    this.minAnimationInterval = minAnimationInterval;
+    this.maxAnimationInterval = maxAnimationInterval;
     this.maxDistance = maxDistance;
     this.instances = instances;
 
@@ -81,8 +81,8 @@ export class ViewSensitiveAnimator {
       // updateRate, how many times per second we should update the instance,
       // based on the distance from the camera
       const updateRate = lerp(
-        this.minAnimationDuration,
-        this.maxAnimationDuration,
+        this.minAnimationInterval,
+        this.maxAnimationInterval,
         distance / this.maxDistance
       );
 
