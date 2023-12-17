@@ -1,7 +1,10 @@
 import { THREE } from "../three";
 import { InstancedAnimation } from "./instanced-animation";
 import { GLTF } from "three/examples/jsm/Addons.js";
-import { InstancedSkinnedMeshData } from "./instanced-skinned-mesh-handler";
+import {
+  AnimationState,
+  InstancedSkinnedMeshData,
+} from "./instanced-skinned-mesh-handler";
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -9,12 +12,15 @@ function lerp(a: number, b: number, t: number): number {
 
 type AnimationGroupID = string;
 type AnimationGroup = {
-  animationIndex: number;
-  currentTime: number;
+  animations: AnimationState[];
   instancesIDs: number[];
 };
 
 type AnimationGroups = Map<AnimationGroupID, AnimationGroup>;
+
+function roundToNearest(value: number, nearest: number): number {
+  return Math.round(value / nearest) * nearest;
+}
 
 export class ViewSensitiveInstancedAnimator {
   private camera: THREE.Camera;
@@ -68,14 +74,16 @@ export class ViewSensitiveInstancedAnimator {
     for (let i = 0; i < this.instancedAnimation.instancesData.length; i++) {
       const instanceData = this.instancedAnimation.instancesData[i];
 
-      const animationDuration =
-        this.instancedAnimation.animations[instanceData.animationIndex]
-          .duration;
+      for (let j = 0; j < instanceData.animations.length; j++) {
+        const animation = instanceData.animations[j];
+        const animationDuration =
+          this.instancedAnimation.animations[animation.animationIndex].duration;
 
-      instanceData.currentTime = instanceData.currentTime + deltaTime;
+        animation.time += deltaTime;
 
-      if (instanceData.currentTime > animationDuration) {
-        instanceData.currentTime = 0;
+        if (animation.time > animationDuration) {
+          animation.time = 0;
+        }
       }
 
       const distance = instanceData.position.distanceTo(this.camera.position);
@@ -102,27 +110,12 @@ export class ViewSensitiveInstancedAnimator {
 
       this.modelBoundingBox.translate(instanceData.position.clone().negate());
 
-      const minAnimationDurationInSeconds = this.minAnimationInterval / 1000;
-
-      let currentTime =
-        Math.round(instanceData.currentTime / minAnimationDurationInSeconds) *
-        minAnimationDurationInSeconds;
-
-      if (distance > this.maxDistance) {
-        const maxAnimationDurationInSeconds = this.maxAnimationInterval / 1000;
-
-        currentTime =
-          Math.round(instanceData.currentTime / maxAnimationDurationInSeconds) *
-          maxAnimationDurationInSeconds;
-      }
-
-      const groupID = `${instanceData.animationIndex}-${currentTime}`;
+      const groupID = this.calculateGroupID(instanceData.animations, distance);
       let group = this.animationGroups.get(groupID);
 
       if (group === undefined) {
         group = {
-          animationIndex: instanceData.animationIndex,
-          currentTime: currentTime,
+          animations: instanceData.animations,
           instancesIDs: [i],
         };
 
@@ -135,16 +128,11 @@ export class ViewSensitiveInstancedAnimator {
     }
 
     for (const group of this.animationGroups.values()) {
-      this.instancedAnimation.updateMixer({
-        animationIndex: group.animationIndex,
-        time: group.currentTime,
-      });
+      this.instancedAnimation.updateMixer(group.animations);
 
       for (const instanceID of group.instancesIDs) {
         this.instancedAnimation.updateSkinnedMeshMatrix(instanceID);
       }
-
-      this.instancedAnimation.stopAnimation(group.animationIndex);
     }
 
     if (this.animationGroups.size > 0) {
@@ -160,5 +148,33 @@ export class ViewSensitiveInstancedAnimator {
 
   get animations() {
     return this.instancedAnimation.animations;
+  }
+
+  private animationPrecision = 0.01;
+  private weightPrecision = 0.05;
+
+  private calculateGroupID(
+    animations: AnimationState[],
+    distance: number
+  ): string {
+    return animations
+      .map((animation) => {
+        let time = roundToNearest(
+          animation.time,
+          this.minAnimationInterval / 1000
+        );
+
+        if (distance > this.maxDistance) {
+          time = roundToNearest(
+            animation.time,
+            this.maxAnimationInterval / 1000
+          );
+        }
+
+        time = roundToNearest(time, this.animationPrecision);
+        const weight = roundToNearest(animation.weight, this.weightPrecision);
+        return `${animation.animationIndex}-${weight}-${time}`;
+      })
+      .join("-");
   }
 }

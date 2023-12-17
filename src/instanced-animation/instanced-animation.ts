@@ -2,9 +2,9 @@ import { THREE } from "../three";
 import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 import { GLTF } from "three/examples/jsm/Addons.js";
 import {
+  AnimationState,
   InstancedSkinnedMeshData,
   InstancedSkinnedMeshHandler,
-  MixerState,
 } from "./instanced-skinned-mesh-handler";
 
 type SimpleSkinnedMesh = THREE.SkinnedMesh<
@@ -101,9 +101,12 @@ export class InstancedAnimation {
     for (let i = 0; i < this.instancesData.length; i++) {
       const instanceData = this.instancesData[i];
 
-      instanceData.currentTime =
-        (instanceData.currentTime + deltaTime) %
-        this.animations[instanceData.animationIndex].duration;
+      for (let j = 0; j < instanceData.animations.length; j++) {
+        const animation = instanceData.animations[j];
+        animation.time =
+          (animation.time + deltaTime) %
+          this.animations[animation.animationIndex].duration;
+      }
 
       this.updateInstance(i, Infinity);
     }
@@ -115,9 +118,9 @@ export class InstancedAnimation {
     }
   }
 
-  updateMixer(mixerState: MixerState) {
+  updateMixer(animations: AnimationState[]) {
     for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
-      this.instancedSkinnedMeshes[i].updateMixer(mixerState);
+      this.instancedSkinnedMeshes[i].updateMixer(animations);
     }
   }
 
