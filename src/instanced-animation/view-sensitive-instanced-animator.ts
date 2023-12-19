@@ -12,7 +12,7 @@ function lerp(a: number, b: number, t: number): number {
 
 type AnimationGroupID = string;
 type AnimationGroup = {
-  animations: AnimationState[];
+  animations: Record<string, AnimationState>;
   instancesIDs: number[];
 };
 
@@ -74,10 +74,11 @@ export class ViewSensitiveInstancedAnimator {
     for (let i = 0; i < this.instancedAnimation.instancesData.length; i++) {
       const instanceData = this.instancedAnimation.instancesData[i];
 
-      for (let j = 0; j < instanceData.animations.length; j++) {
-        const animation = instanceData.animations[j];
+      for (const [animationName, animation] of Object.entries(
+        instanceData.animations
+      )) {
         const animationDuration =
-          this.instancedAnimation.animations[animation.animationIndex].duration;
+          this.instancedAnimation.animationsByName[animationName].duration;
 
         animation.time += deltaTime;
 
@@ -150,31 +151,28 @@ export class ViewSensitiveInstancedAnimator {
     return this.instancedAnimation.animations;
   }
 
-  private animationPrecision = 0.01;
-  private weightPrecision = 0.05;
+  private weightPrecision = 0.1;
 
   private calculateGroupID(
-    animations: AnimationState[],
+    animations: Record<string, AnimationState>,
     distance: number
   ): string {
-    return animations
-      .map((animation) => {
-        let time = roundToNearest(
-          animation.time,
-          this.minAnimationInterval / 1000
-        );
+    let groupID = "";
+    const animationNames = Object.keys(animations).sort();
+    const maxAnimationIntervalSeconds = this.maxAnimationInterval / 1000;
 
-        if (distance > this.maxDistance) {
-          time = roundToNearest(
-            animation.time,
-            this.maxAnimationInterval / 1000
-          );
-        }
+    for (const animationName of animationNames) {
+      const animation = animations[animationName];
 
-        time = roundToNearest(time, this.animationPrecision);
-        const weight = roundToNearest(animation.weight, this.weightPrecision);
-        return `${animation.animationIndex}-${weight}-${time}`;
-      })
-      .join("-");
+      if (distance > this.maxDistance && animation.weight < 0.99) {
+        continue;
+      }
+
+      const time = roundToNearest(animation.time, maxAnimationIntervalSeconds);
+      const weight = roundToNearest(animation.weight, this.weightPrecision);
+      groupID += `${animationName}-${weight}-${time}`;
+    }
+
+    return groupID;
   }
 }

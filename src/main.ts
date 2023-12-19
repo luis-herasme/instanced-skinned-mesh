@@ -74,13 +74,12 @@ const instancedNoViewSensitive: ScenarioCreator = (settings: Settings) => {
         Math.PI / 2
       ),
       scale: new THREE.Vector3(0.01, 0.01, 0.01),
-      animations: [
-        {
-          time: Math.random() * animationDuration,
-          animationIndex,
+      animations: {
+        Walk: {
+          time: 0,
           weight: 1,
         },
-      ],
+      },
     });
   }
 
@@ -112,13 +111,6 @@ const instancedViewSensitive: ScenarioCreator = (settings: Settings) => {
     const y =
       Math.floor((i * PADDING) / GROUND_SIZE) * PADDING - GROUND_SIZE / 2;
 
-    const animationIndex = Math.floor(
-      Math.random() * viewSensitiveInstancedAnimation.animations.length
-    );
-
-    const animationDuration =
-      viewSensitiveInstancedAnimation.animations[animationIndex].duration;
-
     const intance: InstancedSkinnedMeshData = {
       position: new THREE.Vector3(x, 0, y),
       rotation: new THREE.Quaternion().setFromAxisAngle(
@@ -126,13 +118,12 @@ const instancedViewSensitive: ScenarioCreator = (settings: Settings) => {
         Math.PI / 2
       ),
       scale: new THREE.Vector3(0.01, 0.01, 0.01),
-      animations: [
-        {
-          time: Math.random() * animationDuration,
-          animationIndex,
+      animations: {
+        Walk: {
+          time: 0,
           weight: 1,
         },
-      ],
+      },
     };
 
     viewSensitiveInstancedAnimation.addInstance(intance);

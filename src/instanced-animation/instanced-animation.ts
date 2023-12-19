@@ -39,6 +39,7 @@ export class InstancedAnimation {
   public instancesData: InstancedSkinnedMeshData[] = [];
   public instancedSkinnedMeshes: InstancedSkinnedMeshHandler[] = [];
   public maxLevelOfDetail: number = 0;
+  public animationsByName: Record<string, THREE.AnimationClip> = {};
 
   constructor({ gltf, count }: { gltf: GLTF; count: number }) {
     let maxLevel = 0;
@@ -67,7 +68,13 @@ export class InstancedAnimation {
     });
 
     this.maxLevelOfDetail = maxLevel;
-    this.animations = gltf.animations.map((clip) => clip.clone());
+
+    this.animations = gltf.animations.map((clip) => {
+      const animationClip = clip.clone();
+      this.animationsByName[animationClip.name] = animationClip;
+      return animationClip;
+    });
+
     const skinnedMeshes = getSkinnedMesh(gltf);
 
     for (const skinnedMesh of skinnedMeshes) {
@@ -101,11 +108,12 @@ export class InstancedAnimation {
     for (let i = 0; i < this.instancesData.length; i++) {
       const instanceData = this.instancesData[i];
 
-      for (let j = 0; j < instanceData.animations.length; j++) {
-        const animation = instanceData.animations[j];
+      for (const [animationName, animation] of Object.entries(
+        instanceData.animations
+      )) {
         animation.time =
           (animation.time + deltaTime) %
-          this.animations[animation.animationIndex].duration;
+          this.animationsByName[animationName].duration;
       }
 
       this.updateInstance(i, Infinity);
@@ -118,7 +126,7 @@ export class InstancedAnimation {
     }
   }
 
-  updateMixer(animations: AnimationState[]) {
+  updateMixer(animations: Record<string, AnimationState>) {
     for (let i = 0; i < this.instancedSkinnedMeshes.length; i++) {
       this.instancedSkinnedMeshes[i].updateMixer(animations);
     }

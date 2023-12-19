@@ -4,7 +4,6 @@ import { AnimationAction } from "../animation-action";
 import { AnimationMixer } from "../animation-mixer";
 
 export type AnimationState = {
-  animationIndex: number;
   weight: number;
   time: number;
 };
@@ -13,7 +12,7 @@ export type InstancedSkinnedMeshData = {
   position: THREE.Vector3;
   rotation: THREE.Quaternion;
   scale: THREE.Vector3;
-  animations: AnimationState[];
+  animations: Record<string, AnimationState>;
 };
 
 export class InstancedSkinnedMeshHandler {
@@ -23,6 +22,7 @@ export class InstancedSkinnedMeshHandler {
   private skinnedMesh: THREE.SkinnedMesh<THREE.BufferGeometry, THREE.Material>;
   private animations: THREE.AnimationClip[];
   public instancedMesh: InstancedSkinnedMesh;
+  private animationsActionsByName: Record<string, AnimationAction> = {};
 
   constructor({
     count,
@@ -65,6 +65,7 @@ export class InstancedSkinnedMeshHandler {
         track.level = interpolantBone.userData.level;
       });
       const action = this.mixer.clipAction(newClip);
+      this.animationsActionsByName[newClip.name] = action;
       this.animationsActions[index] = action;
     });
 
@@ -84,15 +85,14 @@ export class InstancedSkinnedMeshHandler {
     this.instancedMesh.dispose();
   }
 
-  updateMixer(animations: AnimationState[]) {
+  updateMixer(animations: Record<string, AnimationState>) {
     this.mixer.stopAllAction();
 
-    for (let i = 0; animations.length > i; i++) {
-      const animationAction =
-        this.animationsActions[animations[i].animationIndex];
+    for (const [animationName, animation] of Object.entries(animations)) {
+      const animationAction = this.animationsActionsByName[animationName];
       animationAction.play();
-      animationAction.setEffectiveWeight(animations[i].weight);
-      animationAction.time = animations[i].time;
+      animationAction.setEffectiveWeight(animation.weight);
+      animationAction.time = animation.time;
     }
 
     this.mixer.update(0.001);
