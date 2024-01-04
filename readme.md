@@ -16,7 +16,10 @@ One of the main differences is that this class takes a `GLTF` object and extract
 ### Usage
 
 ```ts
-import { InstancedAnimation } from "./InstancedAnimation.ts";
+import * as THREE from "three";
+import { InstancedAnimation, install } from "three-instanced-animation";
+
+install(THREE);
 
 const instancedAnimation = new InstancedAnimation({
   gltf: gltf,
@@ -49,7 +52,7 @@ function update(deltaTime) {
 If you want to manage the animation update rate of each instance yourself, you can use the `updateInstance` method instead of `update`.
 
 ```ts
-import { InstancedAnimation } from "./InstancedAnimation.ts";
+import { InstancedAnimation } from "three-instanced-animation";
 
 const instancedAnimation = new InstancedAnimation({
   gltf: gltf,
@@ -87,7 +90,7 @@ This is an abstraction around the `InstancedAnimation` class, which allows you t
 ### Usage
 
 ```ts
-import { ViewSensitiveInstancedAnimator } from "./ViewSensitiveInstancedAnimator.ts";
+import { ViewSensitiveInstancedAnimator } from "three-instanced-animation";
 
 const viewSensitiveInstancedAnimator = new ViewSensitiveInstancedAnimator({
   gltf: gltf,
