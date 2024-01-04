@@ -34,7 +34,7 @@ function getSkinnedMesh(gltf: GLTF): SimpleSkinnedMesh[] {
 }
 
 export class InstancedAnimation {
-  public group = new THREE.Group();
+  public group: THREE.Group;
   public animations: THREE.AnimationClip[] = [];
   public instancesData: InstancedSkinnedMeshData[] = [];
   public instancedSkinnedMeshes: InstancedSkinnedMeshHandler[] = [];
@@ -42,6 +42,7 @@ export class InstancedAnimation {
   public animationsByName: Record<string, THREE.AnimationClip> = {};
 
   constructor({ gltf, count }: { gltf: GLTF; count: number }) {
+    this.group = new THREE.Group();
     let maxLevel = 0;
 
     // Add information about the level in the tree that the bone is

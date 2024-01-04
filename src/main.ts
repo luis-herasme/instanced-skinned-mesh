@@ -60,12 +60,12 @@ const instancedNoViewSensitive: ScenarioCreator = (settings: Settings) => {
     const y =
       Math.floor((i * PADDING) / GROUND_SIZE) * PADDING - GROUND_SIZE / 2;
 
-    const animationIndex = Math.floor(
-      Math.random() * instancedAnimation.animations.length
-    );
+    // const animationIndex = Math.floor(
+    //   Math.random() * instancedAnimation.animations.length
+    // );
 
-    const animationDuration =
-      instancedAnimation.animations[animationIndex].duration;
+    // const animationDuration =
+    //   instancedAnimation.animations[animationIndex].duration;
 
     instancedAnimation.addInstance({
       position: new THREE.Vector3(x, 0, y),

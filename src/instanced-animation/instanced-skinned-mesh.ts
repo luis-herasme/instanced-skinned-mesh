@@ -1,16 +1,17 @@
 import { THREE } from "../three";
+import { Matrix4, SkinnedMesh } from "three";
 
-const _instanceLocalMatrix = /*@__PURE__*/ new THREE.Matrix4();
-const _instanceWorldMatrix = /*@__PURE__*/ new THREE.Matrix4();
+const _instanceLocalMatrix = /*@__PURE__*/ new Matrix4();
+const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 
-const _offsetMatrix = /*@__PURE__*/ new THREE.Matrix4();
-const _identityMatrix = /*@__PURE__*/ new THREE.Matrix4();
+const _offsetMatrix = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
 const _instanceIntersects: THREE.Intersection[] = [];
 
 let patchedChunks = false;
 
-export class InstancedSkinnedMesh extends THREE.SkinnedMesh {
+export class InstancedSkinnedMesh extends SkinnedMesh {
   public instanceMatrix: THREE.InstancedBufferAttribute;
   public instanceColor: THREE.InstancedBufferAttribute | null;
   public instanceBones: Float32Array | null;
