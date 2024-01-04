@@ -2,6 +2,12 @@
 
 This repository contains a few classes that allow you to animate a large number of skinned meshes efficiently.
 
+# Instalation
+
+```bash
+npm i three-instanced-animation
+```
+
 ### Demo
 
 [Demo](https://instanced-animation.vercel.app/)
