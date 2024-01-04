@@ -1,6 +1,5 @@
 {
-  "name": "instanced-animation",
-  "private": true,
+  "name": "three-instanced-animation",
   "version": "0.0.0",
   "type": "module",
   "files": [
